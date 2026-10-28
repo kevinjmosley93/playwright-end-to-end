@@ -37,3 +37,38 @@ test("Check if portfolio has SEO Title/Description; Then check to see if the hea
   // Expect Hero button to have text
   await expect(page.locator("#hero")).toContainText("Get In Touch");
 });
+
+test("Check that the contact form at the bottom of the page has name, email and message inputs and a Send Message button; Then submit it and see the Netlify confirmation.", async ({
+  page,
+}) => {
+  await page.goto("https://kevinjmosley.com/");
+
+  const form = page.locator("#contact form[name='contact']");
+  await form.scrollIntoViewIfNeeded();
+
+  // Expect form to have name, email and message inputs
+  const nameInput = form.getByLabel("Name");
+  const emailInput = form.getByLabel("Email");
+  const messageInput = form.getByLabel("Message");
+  await expect(nameInput).toBeVisible();
+  await expect(emailInput).toBeVisible();
+  await expect(messageInput).toBeVisible();
+
+  // Expect form to have a button with the text "Send Message"
+  const sendButton = form.getByRole("button", { name: "Send Message" });
+  await expect(sendButton).toBeVisible();
+
+  // Fill in each field
+  await nameInput.fill("Playwright Test");
+  await emailInput.fill("playwright-test@example.com");
+  await messageInput.fill(
+    "Automated Playwright test submission. Please ignore.",
+  );
+
+  // Submit the form and expect the Netlify confirmation page
+  await sendButton.click();
+  await expect(page.getByRole("heading", { name: "Thank you!" })).toBeVisible();
+  await expect(
+    page.getByText("Your form submission has been received."),
+  ).toBeVisible();
+});
